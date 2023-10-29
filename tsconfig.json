@@ -1,0 +1,24 @@
+{
+    "compilerOptions": {
+      "target": "es5",                          
+      "module": "commonjs",                    
+      "lib": ["es6"],                     
+      "allowJs": true,
+      "outDir": "build",                          
+      "rootDir": "./src",
+      "strict": true,         
+      "noImplicitAny": true,
+      "esModuleInterop": true,
+      "resolveJsonModule": true,
+      "baseUrl": ".",                     /* Đường dẫn cơ sở cho tất cả các đường dẫn được tính từ đó. */
+      "paths": {
+        "@/*": ["src/*"]                  /* Ánh xạ các alias đến các đường dẫn thực tế. */
+      }
+    },
+    "include": [
+      "src/**/*.ts"                      /* Các tệp cần được bao gồm trong biên dịch. */
+    ],
+    "exclude": [
+      "node_modules"                     /* Các thư mục không cần thiết. */
+    ]
+}
