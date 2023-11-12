@@ -2,19 +2,21 @@ import { Request, Response } from "express";
 import Branchs from "../models/branch.model";
 
 async function GET_BRANCH(req: Request, res: Response) {
-  const page = req.query.p || 1;
-  const showLimit: number = 10;
-  const searchs = req.query.search;
+  const page = req.query.page || 1;
+  const showLimit = Number(req.query.limit) || 10;
+  const qsearch = req.query.search;
+  const qsort = req.query.sort?.toString();
   Branchs.find({})
     .limit(showLimit)
     .skip(Number(page) * showLimit)
+    .sort(qsort)
     .then((data) => {
-      if (searchs) {
+      if (qsearch) {
         const results = data.filter((item) => {
           return (
             item.code
               .toLowerCase()
-              .indexOf(searchs.toString().toLowerCase()) !== -1
+              .indexOf(qsearch.toString().toLowerCase()) !== -1
           );
         });
         res.status(200).send(results);

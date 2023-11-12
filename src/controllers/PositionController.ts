@@ -2,19 +2,21 @@ import { Request, Response } from "express";
 import Position from "../models/position.model";
 
 async function GET_POSITION(req: Request, res: Response) {
-  const page = req.query.p || 1;
-  const showLimit: number = 10;
-  const searchs = req.query.search;
+  const page = req.query.page || 1;
+  const showLimit = Number(req.query.limit) || 10;
+  const qsearch = req.query.search;
+  const qsort = req.query.sort?.toString();
   Position.find({})
     .limit(showLimit)
     .skip(Number(page) * showLimit)
+    .sort(qsort)
     .then((data) => {
-      if (searchs) {
+      if (qsearch) {
         const results = data.filter((item) => {
           return (
             item.code
               .toLowerCase()
-              .indexOf(searchs.toString().toLowerCase()) !== -1
+              .indexOf(qsearch.toString().toLowerCase()) !== -1
           );
         });
         res.status(200).send(results);
