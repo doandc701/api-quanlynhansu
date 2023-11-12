@@ -6,38 +6,39 @@ async function GET_BRANCH(req, res) {
   const qsort = req.query.sorts;
   const qfilter = req.query.filters;
   const qsearch = req.query.search;
-  const countRecord = await Branchs.countDocuments();
-  Branchs.find({ qfilter })
-    .limit(showLimit)
-    .skip(showLimit * page - showLimit)
+
+  const recordBranchs = await Branchs.find(qfilter)
     .sort(qsort)
-    .then((data) => {
-      if (qsearch) {
-        const results = data.filter((item) => {
-          return (
-            item.code
-              .toLowerCase()
-              .indexOf(qsearch.toString().toLowerCase()) !== -1
-          );
-        });
-        res.status(200).send({
-          data: results,
-          current_page: page,
-          limit: showLimit,
-          total: countRecord,
-        });
-      } else {
-        res.status(200).send({
-          data: data,
-          current_page: page,
-          limit: showLimit,
-          total: countRecord,
-        });
-      }
-    })
-    .catch(() => {
-      res.status(401).send({ message: "Could not fetch the documents" });
+    .skip(showLimit * page - showLimit)
+    .limit(showLimit)
+    .catch(() => {});
+  const countRecord = await Branchs.countDocuments().catch(() => {});
+
+  if (!recordImage || !countRecord) {
+    res.status(401).json({ message: "Could not fetch the documents" });
+    return;
+  }
+
+  if (qsearch) {
+    const results = data.filter((item) => {
+      return (
+        item.code.toLowerCase().indexOf(qsearch.toString().toLowerCase()) !== -1
+      );
     });
+    res.status(200).send({
+      data: results,
+      current_page: page,
+      limit: showLimit,
+      total: countRecord,
+    });
+  } else {
+    res.status(200).send({
+      data: recordBranchs,
+      current_page: page,
+      limit: showLimit,
+      total: countRecord,
+    });
+  }
 }
 
 async function POST_BRANCH(req, res) {
