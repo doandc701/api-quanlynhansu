@@ -8,6 +8,8 @@ import {
   checkLoginAttempts,
   setLoginAttempts,
 } from "../../middlewares/loginAccountLimiter.js";
+import dotenv from "dotenv";
+dotenv.config();
 
 const ROLES = ObjectDatabase.role;
 const USER = ObjectDatabase.user;
@@ -105,13 +107,9 @@ const SignIn = async (req, res, next) => {
           });
           return;
         }
-        const token = jwt.sign(
-          { id: user.id },
-          process.env.TOKEN_SECRET ? process.env.TOKEN_SECRET : "",
-          {
-            expiresIn: 86400, // 24 hours
-          }
-        );
+        const token = jwt.sign({ id: user.id }, process.env.TOKEN_SECRET, {
+          expiresIn: 86400, // 24 hours
+        });
         let authorities = [];
         for (let i = 0; i < user.roles.length; i++) {
           authorities.push("ROLE_" + user.roles[i].name.toUpperCase());

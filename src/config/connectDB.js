@@ -1,5 +1,7 @@
 import { MongoClient } from "mongodb";
 import mongoose from "mongoose";
+import dotenv from "dotenv";
+dotenv.config();
 
 let dbConnetion;
 const uriCloud =
@@ -17,12 +19,9 @@ export const connectToDb = (callback) => {
     });
 };
 export const getDb = () => dbConnetion;
-
 export const connectMongoose = async () => {
   try {
-    await mongoose.connect(
-      process.env.URL_CONNECT_MONGODB ? process.env.URL_CONNECT_MONGODB : ""
-    );
+    await mongoose.connect(process.env.URL_CONNECT_MONGODB);
     console.log("Connect successfully!");
   } catch (err) {
     console.log("Connect failed!", err);

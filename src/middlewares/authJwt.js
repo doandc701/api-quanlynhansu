@@ -2,16 +2,15 @@ import jwt from "jsonwebtoken";
 import { ObjectDatabase } from "../models/auth/index.js";
 const ROLES = ObjectDatabase.role;
 const USER = ObjectDatabase.user;
+import dotenv from "dotenv";
+dotenv.config();
 
 const verifyToken = (req, res, next) => {
   const token =
     req.body.token || req.query.token || req.header["x-access-token"];
   if (!token) return res.status(401).send("Access Denied");
   try {
-    const verified = jwt.verify(
-      token,
-      process.env.TOKEN_SECRET ? process.env.TOKEN_SECRET : ""
-    );
+    const verified = jwt.verify(token, process.env.TOKEN_SECRET);
     next();
   } catch (err) {
     return res.status(400).send("Invalid Token");

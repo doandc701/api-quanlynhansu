@@ -7,13 +7,15 @@ import {
 import { signInWithEmailAndPassword } from "@firebase/auth";
 import Image from "../models/image.model.js";
 import analytics from "../config/firebase.config.js";
+import dotenv from "dotenv";
+dotenv.config();
 
 async function uploadImage(file, quantity) {
   const storageFB = getStorage();
   await signInWithEmailAndPassword(
     analytics,
-    process.env.FIREBASE_USER ? process.env.FIREBASE_USER : "",
-    process.env.FIREBASE_AUTH ? process.env.FIREBASE_AUTH : ""
+    process.env.FIREBASE_USER,
+    process.env.FIREBASE_AUTH
   );
   if (quantity === "single") {
     const dateTime = Date.now();
