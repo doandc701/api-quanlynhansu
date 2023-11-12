@@ -1,11 +1,9 @@
 import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
-import * as dotenv from "dotenv";
 import { connectMongoose } from "./src/config/connectDB.js";
 import { routes } from "./src/routes/index.js";
 // import { apiLimit } from "./services/rateLimit.service";
-dotenv.config();
 
 const app = express();
 const port = 3000;
