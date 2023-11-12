@@ -4,6 +4,7 @@
   "description": "",
   "main": "/build/index.js",
   "scripts": {
+    "start": "node /build/index.js",
     "serve": "npx nodemon",
     "start:build": "npm run build && node build/index.js",
     "build": "rimraf ./build && tsc",
