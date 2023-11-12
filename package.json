@@ -2,7 +2,7 @@
   "name": "mongodb",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "/build/index.js",
   "scripts": {
     "serve": "npx nodemon",
     "start:build": "npm run build && node build/index.js",
