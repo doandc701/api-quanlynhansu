@@ -1,14 +1,24 @@
 import Department from "../models/department.model.js";
 
 async function GET_DEPARTMENT(req, res) {
-  const page = req.query.p || 1;
-  const showLimit = 10;
-  Department.find({})
+  const page = req.query.page || 1;
+  const showLimit = req.query.limit || 10;
+  const qsort = req.query.sorts;
+  const qfilter = req.query.filters;
+  const qsearch = req.query.search;
+  const countRecord = await Department.countDocuments();
+  Department.find(qfilter)
+    .sort(qsort)
     .limit(showLimit)
-    .skip(Number(page) * showLimit)
+    .skip(showLimit * page - showLimit)
     .populate("code")
     .then((data) => {
-      res.status(200).send(data);
+      res.status(200).send({
+        data: data,
+        current_page: page,
+        limit: showLimit,
+        total: countRecord,
+      });
     })
     .catch(() => {
       res.status(401).send({ message: "Could not fetch the documents" });

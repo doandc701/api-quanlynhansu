@@ -2,12 +2,14 @@ import Branchs from "../models/branch.model.js";
 
 async function GET_BRANCH(req, res) {
   const page = req.query.page || 1;
-  const showLimit = Number(req.query.limit) || 10;
+  const showLimit = req.query.limit || 10;
+  const qsort = req.query.sorts;
+  const qfilter = req.query.filters;
   const qsearch = req.query.search;
-  const qsort = req.query.sort?.toString();
-  Branchs.find({})
+  const countRecord = await Branchs.countDocuments();
+  Branchs.find({ qfilter })
     .limit(showLimit)
-    .skip(Number(page) * showLimit)
+    .skip(showLimit * page - showLimit)
     .sort(qsort)
     .then((data) => {
       if (qsearch) {
@@ -18,9 +20,19 @@ async function GET_BRANCH(req, res) {
               .indexOf(qsearch.toString().toLowerCase()) !== -1
           );
         });
-        res.status(200).send(results);
+        res.status(200).send({
+          data: results,
+          current_page: page,
+          limit: showLimit,
+          total: countRecord,
+        });
       } else {
-        res.status(200).send(data);
+        res.status(200).send({
+          data: data,
+          current_page: page,
+          limit: showLimit,
+          total: countRecord,
+        });
       }
     })
     .catch(() => {

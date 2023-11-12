@@ -2,13 +2,15 @@ import Position from "../models/position.model.js";
 
 async function GET_POSITION(req, res) {
   const page = req.query.page || 1;
-  const showLimit = Number(req.query.limit) || 10;
+  const showLimit = req.query.limit || 10;
+  const qsort = req.query.sorts;
+  const qfilter = req.query.filters;
   const qsearch = req.query.search;
-  const qsort = req.query.sort?.toString();
-  Position.find({})
-    .limit(showLimit)
-    .skip(Number(page) * showLimit)
+  const countRecord = await Position.countDocuments();
+  Position.find(qfilter)
     .sort(qsort)
+    .limit(showLimit)
+    .skip(showLimit * page - showLimit)
     .then((data) => {
       if (qsearch) {
         const results = data.filter((item) => {
@@ -20,7 +22,12 @@ async function GET_POSITION(req, res) {
         });
         res.status(200).send(results);
       } else {
-        res.status(200).send(data);
+        res.status(200).send({
+          data: data,
+          current_page: page,
+          limit: showLimit,
+          total: countRecord,
+        });
       }
     })
     .catch(() => {

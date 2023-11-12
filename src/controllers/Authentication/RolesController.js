@@ -1,12 +1,16 @@
 import { ObjectRole } from "../../models/auth/role.model.js";
 
 export async function getRoles(req, res) {
-  const page = req.query.p || 1;
-  const showLimitRoles = 10;
-  ObjectRole.find({})
-    .sort({ name: 1 })
-    .limit(showLimitRoles)
-    .skip(Number(page) * showLimitRoles)
+  const page = req.query.page || 1;
+  const showLimit = req.query.limit || 10;
+  const qsort = req.query.sorts;
+  const qfilter = req.query.filters;
+  const qsearch = req.query.search;
+  // console.log(qsearch);
+  ObjectRole.find(qfilter)
+    .sort(qsort)
+    .limit(showLimit)
+    .skip(showLimit * page - showLimit)
     .then((role) => {
       res.status(200).json(role);
     })
