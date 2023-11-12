@@ -55,8 +55,8 @@ async function GET_IMAGE(req, res) {
   const qfilter = req.query.filters;
   const qsearch = req.query.search;
 
-  const recordImage = await Image.find(qfilter ? qfilter : {})
-    .sort(qsort ? qsort : {})
+  const recordImage = await Image.find()
+    .sort()
     .skip(showLimit * page - showLimit)
     .limit(showLimit);
   const countRecord = await Image.countDocuments();
