@@ -54,12 +54,12 @@ async function GET_IMAGE(req, res) {
   const qsort = req.query.sorts;
   const qfilter = req.query.filters;
   const qsearch = req.query.search;
-  const countRecord = await Image.countDocuments();
   Image.find(qfilter)
     .sort(qsort)
     .limit(showLimit)
     .skip(showLimit * page - showLimit)
-    .then((data) => {
+    .then(async (data) => {
+      const countRecord = await Image.countDocuments();
       res.status(200).send({
         data: data,
         current_page: page,
