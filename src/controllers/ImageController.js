@@ -7,8 +7,7 @@ import {
 import { signInWithEmailAndPassword } from "@firebase/auth";
 import Image from "../models/image.model.js";
 import analytics from "../config/firebase.config.js";
-import dotenv from "dotenv";
-dotenv.config();
+import "dotenv/config";
 
 async function uploadImage(file, quantity) {
   const storageFB = getStorage();

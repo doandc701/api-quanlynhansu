@@ -2,8 +2,7 @@ import jwt from "jsonwebtoken";
 import { ObjectDatabase } from "../models/auth/index.js";
 const ROLES = ObjectDatabase.role;
 const USER = ObjectDatabase.user;
-import dotenv from "dotenv";
-dotenv.config();
+import "dotenv/config";
 
 const verifyToken = (req, res, next) => {
   const token =

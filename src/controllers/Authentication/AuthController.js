@@ -8,8 +8,7 @@ import {
   checkLoginAttempts,
   setLoginAttempts,
 } from "../../middlewares/loginAccountLimiter.js";
-import dotenv from "dotenv";
-dotenv.config();
+import "dotenv/config";
 
 const ROLES = ObjectDatabase.role;
 const USER = ObjectDatabase.user;
