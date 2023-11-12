@@ -8,7 +8,7 @@ import { routes } from "./src/routes/index.js";
 dotenv.config();
 
 const app = express();
-const port = 5000;
+const port = 3000;
 const corsOptions = {
   origin: ["http://localhost:8080", "http://localhost:9527"],
 };
