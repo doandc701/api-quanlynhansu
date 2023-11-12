@@ -1,8 +1,8 @@
 import Categories from "../models/category.model.js";
 
 async function GET_CATEGORIES(req, res) {
-  const page = req.query.page || 1;
-  const showLimit = req.query.limit || 10;
+  const page = parseInt(req.query.page) || 1;
+  const showLimit = parseInt(req.query.limit) || 10;
   const qsort = req.query.sorts;
   const qfilter = req.query.filters;
   const qsearch = req.query.search;
