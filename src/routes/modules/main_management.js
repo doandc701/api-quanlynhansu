@@ -22,10 +22,10 @@ import {
 const router = express.Router();
 
 // position
-router.delete("/branch/:id", DELETE_POSITION);
-router.put("/branch/:id", PUT_POSITION);
-router.post("/branch", POST_POSITION);
-router.get("/branch", GET_POSITION);
+router.delete("/position/:id", DELETE_POSITION);
+router.put("/position/:id", PUT_POSITION);
+router.post("/position", POST_POSITION);
+router.get("/position", GET_POSITION);
 
 // department
 router.delete("/department/:id", DELETE_DEPARTMENT);

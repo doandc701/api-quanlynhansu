@@ -61,17 +61,12 @@ async function GET_IMAGE(req, res) {
     .limit(showLimit)
     .catch(() => {});
   const countRecord = await Image.countDocuments().catch(() => {});
-
-  if (!recordImage || !countRecord) {
-    res.status(401).json({ message: "Could not fetch the documents" });
-  } else {
-    res.status(200).json({
-      data: recordImage,
-      current_page: page,
-      limit: showLimit,
-      total: countRecord,
-    });
-  }
+  res.status(200).json({
+    data: recordImage,
+    current_page: page,
+    limit: showLimit,
+    total: countRecord,
+  });
 }
 
 async function POST_IMAGE(req, res) {

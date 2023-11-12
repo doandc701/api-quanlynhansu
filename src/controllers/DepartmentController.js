@@ -6,23 +6,20 @@ async function GET_DEPARTMENT(req, res) {
   const qsort = req.query.sorts;
   const qfilter = req.query.filters;
   const qsearch = req.query.search;
-  const countRecord = await Department.countDocuments();
-  Department.find(qfilter)
+
+  const countRecord = await Department.countDocuments().catch(() => {});
+  const recordDepartment = await Department.find(qfilter)
     .sort(qsort)
-    .limit(showLimit)
     .skip(showLimit * page - showLimit)
-    .populate("code")
-    .then((data) => {
-      res.status(200).send({
-        data: data,
-        current_page: page,
-        limit: showLimit,
-        total: countRecord,
-      });
-    })
-    .catch(() => {
-      res.status(401).send({ message: "Could not fetch the documents" });
-    });
+    .limit(showLimit)
+    .catch(() => {});
+
+  res.status(200).json({
+    data: recordDepartment,
+    current_page: page,
+    limit: showLimit,
+    total: countRecord,
+  });
 }
 
 async function POST_DEPARTMENT(req, res) {

@@ -6,22 +6,20 @@ async function GET_CATEGORIES(req, res) {
   const qsort = req.query.sorts;
   const qfilter = req.query.filters;
   const qsearch = req.query.search;
-  const countRecord = await Categories.countDocuments();
-  Categories.find(qfilter)
+
+  const recordCategories = await Categories.find(qfilter)
     .sort(qsort)
-    .limit(showLimit)
     .skip(showLimit * page - showLimit)
-    .then((data) => {
-      res.status(200).send({
-        data: data,
-        current_page: page,
-        limit: showLimit,
-        total: countRecord,
-      });
-    })
-    .catch(() => {
-      res.status(500).send({ message: "Could not fetch the documents" });
-    });
+    .limit(showLimit)
+    .catch(() => {});
+  const countRecord = await Categories.countDocuments().catch(() => {});
+
+  res.status(200).json({
+    data: recordCategories,
+    current_page: page,
+    limit: showLimit,
+    total: countRecord,
+  });
 }
 
 async function POST_CATEGORIES(req, res) {

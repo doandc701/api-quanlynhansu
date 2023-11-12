@@ -6,33 +6,34 @@ async function GET_POSITION(req, res) {
   const qsort = req.query.sorts;
   const qfilter = req.query.filters;
   const qsearch = req.query.search;
-  const countRecord = await Position.countDocuments();
-  Position.find(qfilter)
+
+  const countRecord = await Position.countDocuments().catch(() => {});
+  const recordPosition = await Position.find(qfilter)
     .sort(qsort)
-    .limit(showLimit)
     .skip(showLimit * page - showLimit)
-    .then((data) => {
-      if (qsearch) {
-        const results = data.filter((item) => {
-          return (
-            item.code
-              .toLowerCase()
-              .indexOf(qsearch.toString().toLowerCase()) !== -1
-          );
-        });
-        res.status(200).send(results);
-      } else {
-        res.status(200).send({
-          data: data,
-          current_page: page,
-          limit: showLimit,
-          total: countRecord,
-        });
-      }
-    })
-    .catch(() => {
-      res.status(401).send({ message: "Could not fetch the documents" });
+    .limit(showLimit)
+    .catch(() => {});
+
+  if (qsearch) {
+    const results = recordPosition.filter((item) => {
+      return (
+        item.code.toLowerCase().indexOf(qsearch.toString().toLowerCase()) !== -1
+      );
     });
+    res.status(200).send({
+      data: results,
+      current_page: page,
+      limit: showLimit,
+      total: countRecord,
+    });
+  } else {
+    res.status(200).send({
+      data: recordPosition,
+      current_page: page,
+      limit: showLimit,
+      total: countRecord,
+    });
+  }
 }
 
 async function POST_POSITION(req, res) {

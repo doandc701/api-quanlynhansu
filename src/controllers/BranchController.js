@@ -14,13 +14,8 @@ async function GET_BRANCH(req, res) {
     .catch(() => {});
   const countRecord = await Branchs.countDocuments().catch(() => {});
 
-  if (!recordImage || !countRecord) {
-    res.status(401).json({ message: "Could not fetch the documents" });
-    return;
-  }
-
   if (qsearch) {
-    const results = data.filter((item) => {
+    const results = recordBranchs.filter((item) => {
       return (
         item.code.toLowerCase().indexOf(qsearch.toString().toLowerCase()) !== -1
       );
