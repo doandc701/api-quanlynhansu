@@ -54,22 +54,23 @@ async function GET_IMAGE(req, res) {
   const qsort = req.query.sorts;
   const qfilter = req.query.filters;
   const qsearch = req.query.search;
-  Image.find(qfilter)
+
+  const recordImage = await Image.find(qfilter)
     .sort(qsort)
-    .limit(showLimit)
     .skip(showLimit * page - showLimit)
-    .then(async (data) => {
-      const countRecord = await Image.countDocuments();
-      res.status(200).send({
-        data: data,
-        current_page: page,
-        limit: showLimit,
-        total: countRecord,
-      });
-    })
-    .catch(() => {
-      res.status(401).send({ message: "Could not fetch the documents" });
+    .limit(showLimit);
+  const countRecord = await Image.countDocuments();
+
+  if (!recordImage || !countRecord) {
+    res.status(401).send({ message: "Could not fetch the documents" });
+  } else {
+    res.status(200).send({
+      data: recordImage,
+      current_page: page,
+      limit: showLimit,
+      total: countRecord,
     });
+  }
 }
 
 async function POST_IMAGE(req, res) {
