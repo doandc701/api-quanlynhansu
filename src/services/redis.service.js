@@ -1,9 +1,10 @@
 import RedisClient from "ioredis";
+import "dotenv/config";
 
 export const client = new RedisClient({
-  port: 18005, // Redis port
-  host: "redis-18005.c295.ap-southeast-1-1.ec2.cloud.redislabs.com", // Redis host
-  username: "default", // needs Redis >= 6
-  password: "yvKztdp9YLHAUyewD8mNaVYvSTAs6hTo",
+  port:  process.env.REDIS_PORT, // Redis port
+  host: process.env.REDIS_HOST, // Redis host
+  username: process.env.REDIS_NAME, // needs Redis >= 6
+  password: process.env.REDIS_PASSWORD,
   db: 0, // Defaults to 0
 });

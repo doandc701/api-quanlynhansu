@@ -51,7 +51,7 @@ async function uploadImage(file, quantity) {
 async function GET_IMAGE(req, res) {
   const page = parseInt(req.query.page) || 1;
   const showLimit = parseInt(req.query.limit) || 10;
-  const qsort = req.query.sorts;
+  const qsort = req.query.sorts || { _id: "desc" };
   const qfilter = req.query.filters;
   const qsearch = req.query.search;
 
@@ -82,13 +82,13 @@ async function POST_IMAGE(req, res) {
       await image
         .save()
         .then((add) => {
-          res.status(200).send(add);
+          res.status(200).json(add);
         })
         .catch((error) => {
-          res.status(422).send({ message: "Ảnh đã tồn tại !" });
+          res.status(422).json({ message: "Ảnh đã tồn tại !" });
         });
     } catch (error) {
-      res.status(401).send({ message: error });
+      res.status(401).json({ message: error });
     }
   }
 }
@@ -96,10 +96,10 @@ async function POST_IMAGE(req, res) {
 function PUT_IMAGE(req, res) {
   Image.findByIdAndUpdate(req.params.id, req.body)
     .then((data) => {
-      res.status(200).send(data);
+      res.status(200).json(data);
     })
     .catch((error) => {
-      res.status(401).send({ message: error });
+      res.status(401).json({ message: error });
     });
 }
 
@@ -109,7 +109,7 @@ async function DELETE_IMAGE(req, res) {
       res.status(200).json("Delete Success");
     })
     .catch((error) => {
-      res.status(401).send({ message: error });
+      res.status(401).json({ message: error });
     });
 }
 
