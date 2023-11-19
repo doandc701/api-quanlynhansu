@@ -156,16 +156,10 @@ const SignIn = async (req, res, next) => {
 
         res.status(200).json({
           data: {
-            ...user,
-            nameRole: authorities,
+            data: user,
+            roles: authorities,
+            accessToken: token,
           },
-          // data: {
-          //   id: user._id,
-          //   username: user.username,
-          //   email: user.email,
-          //   roles: authorities,
-          //   accessToken: token,
-          // },
           message: "Đăng nhập thành công.",
         });
       })
