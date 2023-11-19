@@ -4,8 +4,14 @@ const { Schema } = mongoose;
 
 const User = new Schema(
   {
-    code: String,
-    username: String,
+    code: { type: String },
+    username: {
+      type: String,
+      trim: true,
+      sparse: true,
+    },
+    first_name: { type: String },
+    last_name: { type: String },
     email: {
       type: String,
       required: true,
@@ -13,8 +19,13 @@ const User = new Schema(
       unique: true,
       sparse: true,
     },
-    password: String,
-    phone_number: String,
+    password: {
+      type: String,
+      required: true,
+      trim: true,
+      sparse: true,
+    },
+    phone_number: { type: String },
     branch_code: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -33,13 +44,16 @@ const User = new Schema(
         ref: "positions",
       },
     ],
-    avatar_id: String,
+    avatar_id: { type: String },
     role_id: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "role",
+        ref: "roles",
       },
     ],
+    access_token: { type: String },
+    token_type: { type: String },
+    expires_in: { type: Number },
   },
   {
     timestamps: true,

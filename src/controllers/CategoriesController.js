@@ -3,7 +3,7 @@ import Categories from "../models/category.model.js";
 async function GET_CATEGORIES(req, res) {
   const page = parseInt(req.query.page) || 1;
   const showLimit = parseInt(req.query.limit) || 10;
-  const qsort = req.query.sorts;
+  const qsort = req.query.sorts || { _id: "desc" };
   const qfilter = req.query.filters;
   const qsearch = req.query.search;
 
@@ -27,20 +27,20 @@ async function POST_CATEGORIES(req, res) {
   await categories
     .save()
     .then((add) => {
-      res.status(200).send(add);
+      res.status(200).json(add);
     })
     .catch((error) => {
-      res.status(500).send({ message: error });
+      res.status(500).json({ message: error });
     });
 }
 
 function PUT_CATEGORIES(req, res) {
   Categories.findByIdAndUpdate(req.params.id, req.body)
     .then((data) => {
-      res.status(200).send(data);
+      res.status(200).json(data);
     })
     .catch((error) => {
-      res.status(500).send({ message: error });
+      res.status(500).json({ message: error });
     });
 }
 
@@ -50,7 +50,7 @@ async function DELETE_CATEGORIES(req, res) {
       res.status(200).json("Delete Success");
     })
     .catch((error) => {
-      res.status(500).send({ message: error });
+      res.status(500).json({ message: error });
     });
 }
 

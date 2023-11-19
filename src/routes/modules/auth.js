@@ -16,6 +16,7 @@ import authPage from "../../middlewares/basicAuth.js";
 import {
   SignUp,
   SignIn,
+  GET_USER,
 } from "../../controllers/Authentication/AuthController.js";
 
 import {
@@ -28,14 +29,8 @@ import {
 const router = express.Router();
 
 router.post("/register", SignUp);
-// PERMISSION ADMIN AND MODIFILED
-router.post(
-  "/login",
-  authPage(["653e841ffc470d2ccd17292b", "653e842bfc470d2ccd17292d"]),
-  SignIn
-);
-// PERMISSION EMPLOYEE
-router.post("/buyer/login", authPage(["653e8458fc470d2ccd17292f"]), SignIn);
+router.post("/login", SignIn);
+router.get("/register", GET_USER);
 
 // Authorization:
 router.get("/api/test/all", allAccess);

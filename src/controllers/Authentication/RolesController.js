@@ -3,7 +3,7 @@ import { ObjectRole } from "../../models/auth/role.model.js";
 export async function getRoles(req, res) {
   const page = parseInt(req.query.page) || 1;
   const showLimit = parseInt(req.query.limit) || 10;
-  const qsort = req.query.sorts;
+  const qsort = req.query.sorts || { _id: "desc" };
   const qfilter = req.query.filters;
   const qsearch = req.query.search;
 
@@ -27,9 +27,9 @@ export async function postRoles(req, res) {
   await role
     .save()
     .then((add) => {
-      res.status(200).send(add);
+      res.status(200).json(add);
     })
     .catch((error) => {
-      res.status(401).send({ message: error });
+      res.status(401).json({ message: error });
     });
 }

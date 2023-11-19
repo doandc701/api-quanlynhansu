@@ -3,7 +3,7 @@ import Department from "../models/department.model.js";
 async function GET_DEPARTMENT(req, res) {
   const page = parseInt(req.query.page) || 1;
   const showLimit = parseInt(req.query.limit) || 10;
-  const qsort = req.query.sorts;
+  const qsort = req.query.sorts || { _id: "desc" };
   const qfilter = req.query.filters;
   const qsearch = req.query.search;
 
@@ -27,20 +27,20 @@ async function POST_DEPARTMENT(req, res) {
   await checkout
     .save()
     .then((add) => {
-      res.status(200).send(add);
+      res.status(200).json(add);
     })
     .catch((error) => {
-      res.status(401).send({ message: error });
+      res.status(401).json({ message: error });
     });
 }
 
 function PUT_DEPARTMENT(req, res) {
   Department.findByIdAndUpdate(req.params.id, req.body)
     .then((data) => {
-      res.status(200).send(data);
+      res.status(200).json(data);
     })
     .catch((error) => {
-      res.status(401).send({ message: error });
+      res.status(401).json({ message: error });
     });
 }
 
@@ -50,7 +50,7 @@ async function DELETE_DEPARTMENT(req, res) {
       res.status(200).json("Delete Success");
     })
     .catch((error) => {
-      res.status(401).send({ message: error });
+      res.status(401).json({ message: error });
     });
 }
 
