@@ -1,24 +1,47 @@
 import Department from "../models/department.model.js";
 
-async function GET_DEPARTMENT(req, res) {
-  const page = parseInt(req.query.page) || 1;
-  const showLimit = parseInt(req.query.limit) || 10;
-  const qsort = req.query.sorts || { _id: "desc" };
-  const qfilter = req.query.filters;
-  const qsearch = req.query.search;
-
+async function LIST_DEPARTMENT(req, res) {
+  const newQuery = req.query;
+  const searchCondition = {};
   const countRecord = await Department.countDocuments().catch(() => {});
-  const recordDepartment = await Department.find(qfilter)
-    .sort(qsort)
-    .skip(showLimit * page - showLimit)
-    .limit(showLimit)
-    .catch(() => {});
+  if (newQuery) {
+    const skip =
+      Number(newQuery.page) * Number(newQuery.limit) - Number(newQuery.limit);
+    let query = Department.find();
+    if (newQuery.sorts) {
+      if (Object.keys(newQuery.sorts).length > 0) {
+        query = query.sort(newQuery.sorts);
+      }
+    }
+    if (newQuery.search && Object.keys(newQuery.search).length > 0) {
+      searchCondition.$or = [];
+      for (const key in newQuery.search) {
+        const fieldCondition = {};
+        fieldCondition[key] = { $regex: newQuery.search[key], $options: "i" };
+        searchCondition.$or.push(fieldCondition);
+      }
+      query = Department.find(searchCondition);
+    }
+    const results = await query
+      .skip(skip)
+      .limit(newQuery.limit)
+      .catch(() => {});
 
+    return res.status(200).json({
+      data: results,
+      current_page: Number(newQuery.page),
+      limit: Number(newQuery.limit),
+      total: countRecord,
+    });
+  }
+}
+
+async function GET_DEPARTMENT(req, res) {
+  const recordDepartment = await Department.findOne({
+    code: req.params.code,
+  }).catch(() => {});
   res.status(200).json({
     data: recordDepartment,
-    current_page: page,
-    limit: showLimit,
-    total: countRecord,
   });
 }
 
@@ -54,4 +77,10 @@ async function DELETE_DEPARTMENT(req, res) {
     });
 }
 
-export { GET_DEPARTMENT, POST_DEPARTMENT, PUT_DEPARTMENT, DELETE_DEPARTMENT };
+export {
+  LIST_DEPARTMENT,
+  GET_DEPARTMENT,
+  POST_DEPARTMENT,
+  PUT_DEPARTMENT,
+  DELETE_DEPARTMENT,
+};

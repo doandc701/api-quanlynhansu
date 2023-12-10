@@ -13,40 +13,81 @@ import "dotenv/config";
 const ROLES = ObjectDatabase.role;
 const USER = ObjectDatabase.user;
 
-async function GET_USER(req, res, next) {
-  const page = parseInt(req.query.page) || 1;
-  const showLimit = parseInt(req.query.limit) || 10;
-  const qsort = req.query.sorts || { _id: "desc" };
-  const qfilter = req.query.filters;
-  const qsearch = req.query.search;
-
-  const recordUsers = await USER.find(qfilter)
-    .sort(qsort)
-    .skip(showLimit * page - showLimit)
-    .limit(showLimit)
-    .catch(() => {});
+async function LIST_USER(req, res) {
+  const newQuery = req.query;
+  const searchCondition = {};
   const countRecord = await USER.countDocuments().catch(() => {});
+  if (newQuery) {
+    const skip =
+      Number(newQuery.page) * Number(newQuery.limit) - Number(newQuery.limit);
+    let query = USER.find();
+    if (newQuery.sorts) {
+      if (Object.keys(newQuery.sorts).length > 0) {
+        query = query.sort(newQuery.sorts);
+      }
+    }
+    if (newQuery.search && Object.keys(newQuery.search).length > 0) {
+      searchCondition.$or = [];
+      for (const key in newQuery.search) {
+        const fieldCondition = {};
+        fieldCondition[key] = { $regex: newQuery.search[key], $options: "i" };
+        searchCondition.$or.push(fieldCondition);
+      }
+      query = USER.find(searchCondition);
+    }
+    const results = await query
+      .skip(skip)
+      .limit(newQuery.limit)
+      .catch(() => {});
 
-  if (qsearch) {
-    const results = recordUsers.filter((item) => {
-      return (
-        item.code.toLowerCase().indexOf(qsearch.toString().toLowerCase()) !== -1
-      );
-    });
-    res.status(200).json({
+    return res.status(200).json({
       data: results,
-      current_page: page,
-      limit: showLimit,
-      total: countRecord,
-    });
-  } else {
-    res.status(200).json({
-      data: recordUsers,
-      current_page: page,
-      limit: showLimit,
+      current_page: Number(newQuery.page),
+      limit: Number(newQuery.limit),
       total: countRecord,
     });
   }
+}
+
+async function GET_USER(req, res, next) {
+  const recordUsers = await USER.findOne({ code: req.params.code }).catch(
+    () => {}
+  );
+  res.status(200).json({
+    data: recordUsers,
+  });
+}
+
+async function POST_USER(req, res) {
+  const user = new USER(req.body);
+  await user
+    .save()
+    .then((add) => {
+      res.status(200).json(add);
+    })
+    .catch((error) => {
+      res.status(401).json({ message: error });
+    });
+}
+
+function PUT_USER(req, res) {
+  USER.updateOne(req.body)
+    .then((data) => {
+      res.status(200).json(data);
+    })
+    .catch((error) => {
+      res.status(401).json({ message: error });
+    });
+}
+
+async function DELETE_USER(req, res) {
+  await USER.deleteOne({ code: req.params.code })
+    .then((deleted) => {
+      res.status(200).json(deleted);
+    })
+    .catch((error) => {
+      res.status(401).json({ message: error });
+    });
 }
 
 const SignUp = async (req, res) => {
@@ -182,4 +223,12 @@ const SignIn = async (req, res, next) => {
   }
 };
 
-export { SignIn, SignUp, GET_USER };
+export {
+  LIST_USER,
+  GET_USER,
+  POST_USER,
+  PUT_USER,
+  DELETE_USER,
+  SignIn,
+  SignUp,
+};

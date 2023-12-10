@@ -6,16 +6,20 @@ import { routes } from "./src/routes/index.js";
 // import { apiLimit } from "./services/rateLimit.service";
 
 const app = express();
-const port = 3000;
-const corsOptions = {
-  origin: ["http://localhost:8080", "http://localhost:9527"],
-};
+const port = 3008;
+// const corsOptions = {
+//   origin: [
+//     "http://localhost:8080",
+//     "http://localhost:9527",
+//     "http://127.0.0.1:5173",
+//   ],
+// };
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 // app.use(apiLimit);
 // cors
-app.use(cors(corsOptions));
+app.use(cors());
 routes(app);
 connectMongoose();
 app.listen(port, () => {

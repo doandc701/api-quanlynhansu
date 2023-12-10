@@ -16,7 +16,6 @@ import authPage from "../../middlewares/basicAuth.js";
 import {
   SignUp,
   SignIn,
-  GET_USER,
 } from "../../controllers/Authentication/AuthController.js";
 
 import {
@@ -30,7 +29,6 @@ const router = express.Router();
 
 router.post("/register", SignUp);
 router.post("/login", SignIn);
-router.get("/register", GET_USER);
 
 // Authorization:
 router.get("/api/test/all", allAccess);

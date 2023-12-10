@@ -1,6 +1,7 @@
 import express from "express";
 
 import {
+  LIST_CATEGORIES,
   GET_CATEGORIES,
   POST_CATEGORIES,
   PUT_CATEGORIES,
@@ -9,9 +10,10 @@ import {
 
 const router = express.Router();
 
-router.delete("/:id", DELETE_CATEGORIES);
-router.put("/:id", PUT_CATEGORIES);
+router.delete("/:code", DELETE_CATEGORIES);
+router.put("/:code", PUT_CATEGORIES);
 router.post("/", POST_CATEGORIES);
-router.get("/", GET_CATEGORIES);
+router.get("/:code", GET_CATEGORIES);
+router.get("/", LIST_CATEGORIES);
 
 export default router;
