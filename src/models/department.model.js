@@ -4,13 +4,10 @@ const { Schema } = mongoose;
 
 const departments = new Schema(
   {
-    code: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "branchs",
-      },
-    ],
+    code: String,
     name: String,
+    branch_code: String,
+    offices: Array,
   },
   {
     timestamps: true,

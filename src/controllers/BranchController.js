@@ -57,7 +57,7 @@ async function POST_BRANCH(req, res) {
 }
 
 function PUT_BRANCH(req, res) {
-  Branchs.updateOne(req.body)
+  Branchs.updateOne({ code: req.params.code }, { $set: req.body })
     .then((data) => {
       res.status(200).json(data);
     })

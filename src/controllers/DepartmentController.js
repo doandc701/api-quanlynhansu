@@ -26,7 +26,6 @@ async function LIST_DEPARTMENT(req, res) {
       .skip(skip)
       .limit(newQuery.limit)
       .catch(() => {});
-
     return res.status(200).json({
       data: results,
       current_page: Number(newQuery.page),
@@ -58,7 +57,7 @@ async function POST_DEPARTMENT(req, res) {
 }
 
 function PUT_DEPARTMENT(req, res) {
-  Department.findByIdAndUpdate(req.params.id, req.body)
+  Department.updateOne({ code: req.params.code }, { $set: req.body })
     .then((data) => {
       res.status(200).json(data);
     })
@@ -68,7 +67,7 @@ function PUT_DEPARTMENT(req, res) {
 }
 
 async function DELETE_DEPARTMENT(req, res) {
-  await Department.findByIdAndDelete(req.params.id)
+  await Department.deleteOne({ code: req.params.code })
     .then((deleted) => {
       res.status(200).json("Delete Success");
     })
