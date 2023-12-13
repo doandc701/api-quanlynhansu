@@ -4,6 +4,9 @@ import sanitize from "mongo-sanitize"; // ngan chan injection
 import ip from "ip";
 import { client } from "../../services/redis.service.js";
 import { ObjectDatabase } from "../../models/auth/index.js";
+import Department from "../../models/department.model.js";
+import Branchs from "../../models/branch.model.js";
+
 import {
   checkLoginAttempts,
   setLoginAttempts,
@@ -70,8 +73,20 @@ async function POST_USER(req, res) {
     });
 }
 
-function PUT_USER(req, res) {
-  USER.updateOne(req.body)
+async function PUT_USER(req, res) {
+  // console.log(req.body);
+  let dataObject = Object.assign(req.body);
+  const recordBranch = await Branchs.findOne({
+    code: { $in: req.body.branch_code },
+  });
+  const recordDepartment = await Department.findOne({
+    code: { $in: req.body.department_code },
+  });
+  if (recordBranch) dataObject.branch_code = recordBranch;
+  if (recordDepartment) dataObject.department_code = recordDepartment;
+  // console.log(dataObject);
+
+  USER.updateOne({ code: req.params.code }, { $set: dataObject })
     .then((data) => {
       res.status(200).json(data);
     })
@@ -99,6 +114,7 @@ const SignUp = async (req, res) => {
     return;
   }
   const user = new USER({
+    code: req.body.code,
     email: sanitize(req.body.email),
     password: bcrypt.hashSync(req.body.password, 8),
   });
@@ -107,9 +123,10 @@ const SignUp = async (req, res) => {
     .then((user) => {
       const RqRoles = req.body.roles;
       if (RqRoles) {
-        ROLES.find({ name: { $in: RqRoles } })
+        ROLES.findOne({ name: { $in: RqRoles } })
           .then((roles) => {
-            user.role_id = roles.map((role) => role._id);
+            // user.role_id = roles.map((role) => role.code);
+            user.role_id = roles.code;
             user
               .save()
               .then(() => {

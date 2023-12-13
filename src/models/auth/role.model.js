@@ -10,6 +10,7 @@ const Role = new Schema(
       unique: true,
       sparse: true,
     },
+    code: Number,
   },
   {
     timestamps: true,

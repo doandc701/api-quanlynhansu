@@ -26,34 +26,15 @@ const User = new Schema(
       sparse: true,
     },
     phone_number: { type: String },
-    branch_code: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "branchs",
-      },
-    ],
-    department_code: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "departments",
-      },
-    ],
-    postition_id: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "positions",
-      },
-    ],
+    branch_code: Object,
+    department_code: Object,
+    position_id: Number,
     avatar_id: { type: String },
-    role_id: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "roles",
-      },
-    ],
+    role_id: Number,
     access_token: { type: String },
     token_type: { type: String },
     expires_in: { type: Number },
+    timezone: String,
   },
   {
     timestamps: true,
