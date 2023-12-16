@@ -6,7 +6,7 @@ import { routes } from "./src/routes/index.js";
 // import { apiLimit } from "./services/rateLimit.service";
 
 const app = express();
-const port = 3008;
+const port = 3000;
 // const corsOptions = {
 //   origin: [
 //     "http://localhost:8080",
