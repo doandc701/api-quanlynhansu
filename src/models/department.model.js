@@ -4,10 +4,15 @@ const { Schema } = mongoose;
 
 const departments = new Schema(
   {
-    code: String,
+    code: {
+      type: String,
+      required: true,
+      trim: true,
+      unique: true,
+      sparse: true,
+    },
     name: String,
-    branch_code: String,
-    offices: Array,
+    branch_code: Object,
   },
   {
     timestamps: true,

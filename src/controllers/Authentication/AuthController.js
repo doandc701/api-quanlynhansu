@@ -62,7 +62,18 @@ async function GET_USER(req, res, next) {
 }
 
 async function POST_USER(req, res) {
-  const user = new USER(req.body);
+  let dataObject = Object.assign(req.body);
+  dataObject.password = bcrypt.hashSync("Pass1234@", 8);
+  const recordBranch = await Branchs.findOne({
+    code: { $in: req.body.branch_code },
+  });
+  const recordDepartment = await Department.findOne({
+    code: { $in: req.body.department_code },
+  });
+  if (recordBranch) dataObject.branch_code = recordBranch;
+  if (recordDepartment) dataObject.department_code = recordDepartment;
+
+  const user = new USER(dataObject);
   await user
     .save()
     .then((add) => {
@@ -74,7 +85,6 @@ async function POST_USER(req, res) {
 }
 
 async function PUT_USER(req, res) {
-  // console.log(req.body);
   let dataObject = Object.assign(req.body);
   const recordBranch = await Branchs.findOne({
     code: { $in: req.body.branch_code },
@@ -84,7 +94,6 @@ async function PUT_USER(req, res) {
   });
   if (recordBranch) dataObject.branch_code = recordBranch;
   if (recordDepartment) dataObject.department_code = recordDepartment;
-  // console.log(dataObject);
 
   USER.updateOne({ code: req.params.code }, { $set: dataObject })
     .then((data) => {
@@ -207,15 +216,13 @@ const SignIn = async (req, res, next) => {
         const token = jwt.sign({ id: user.id }, process.env.TOKEN_SECRET, {
           expiresIn: 86400, // 24 hours
         });
-        let authorities = [];
-        for (let i = 0; i < user.role_id.length; i++) {
-          authorities.push(user.role_id[i].name.toUpperCase());
-        }
-
+        // let authorities = [];
+        // for (let i = 0; i < user.role_id.length; i++) {
+        //   authorities.push(user.role_id[i].name.toUpperCase());
+        // }
         res.status(200).json({
           data: {
             data: user,
-            roles: authorities,
             accessToken: token,
           },
           message: "Đăng nhập thành công.",

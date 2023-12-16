@@ -4,7 +4,14 @@ const { Schema } = mongoose;
 
 const User = new Schema(
   {
-    code: { type: String },
+    code: {
+      type: String,
+      required: true,
+      trim: true,
+      unique: true,
+      sparse: true,
+      index: true,
+    },
     username: {
       type: String,
       trim: true,
@@ -21,7 +28,6 @@ const User = new Schema(
     },
     password: {
       type: String,
-      required: true,
       trim: true,
       sparse: true,
     },
@@ -30,6 +36,7 @@ const User = new Schema(
     department_code: Object,
     position_id: Number,
     avatar_id: { type: String },
+    avatar_path: { type: String },
     role_id: Number,
     access_token: { type: String },
     token_type: { type: String },
@@ -40,4 +47,11 @@ const User = new Schema(
     timestamps: true,
   }
 );
+
+User.methods.toJSON = function () {
+  const userObject = this.toObject();
+  delete userObject.password;
+  return userObject;
+};
+
 export const ObjectUsers = mongoose.model("users", User);

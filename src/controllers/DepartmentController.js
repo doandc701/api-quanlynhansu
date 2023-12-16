@@ -1,4 +1,5 @@
 import Department from "../models/department.model.js";
+import Branchs from "../models/branch.model.js";
 
 async function LIST_DEPARTMENT(req, res) {
   const newQuery = req.query;
@@ -22,6 +23,13 @@ async function LIST_DEPARTMENT(req, res) {
       }
       query = Department.find(searchCondition);
     }
+
+    if (newQuery.filters) {
+      if (newQuery.filters.branch) {
+        query = query.where("branch_code.code").equals(newQuery.filters.branch);
+      }
+    }
+
     const results = await query
       .skip(skip)
       .limit(newQuery.limit)
@@ -45,7 +53,13 @@ async function GET_DEPARTMENT(req, res) {
 }
 
 async function POST_DEPARTMENT(req, res) {
-  const checkout = new Department(req.body);
+  let dataObject = Object.assign(req.body);
+  const recordBranch = await Branchs.findOne({
+    code: { $in: req.body.branch_code },
+  });
+  if (recordBranch) dataObject.branch_code = recordBranch;
+
+  const checkout = new Department(dataObject);
   await checkout
     .save()
     .then((add) => {
@@ -56,8 +70,14 @@ async function POST_DEPARTMENT(req, res) {
     });
 }
 
-function PUT_DEPARTMENT(req, res) {
-  Department.updateOne({ code: req.params.code }, { $set: req.body })
+async function PUT_DEPARTMENT(req, res) {
+  let dataObject = Object.assign(req.body);
+  const recordBranch = await Branchs.findOne({
+    code: { $in: req.body.branch_code },
+  });
+  if (recordBranch) dataObject.branch_code = recordBranch;
+
+  Department.updateOne({ code: req.params.code }, { $set: dataObject })
     .then((data) => {
       res.status(200).json(data);
     })

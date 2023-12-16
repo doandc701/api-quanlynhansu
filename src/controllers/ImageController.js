@@ -70,8 +70,15 @@ async function GET_IMAGE(req, res) {
 }
 
 async function POST_IMAGE(req, res) {
-  const image = new Image(req.body);
   if (req.file) {
+    const findExit = await Image.findOne({
+      origin_name: req.file.originalname,
+    }).catch(() => {});
+
+    if (findExit) {
+      return res.status(422).json({ message: "Ảnh đã tồn tại !" });
+    }
+    const image = new Image();
     const file = {
       type: req.file.mimetype,
       buffer: req.file.buffer,
@@ -79,13 +86,14 @@ async function POST_IMAGE(req, res) {
     try {
       const buildImage = await uploadImage(file, "single");
       image.path = buildImage;
+      image.origin_name = req.file.originalname;
       await image
         .save()
         .then((add) => {
           res.status(200).json(add);
         })
         .catch((error) => {
-          res.status(422).json({ message: "Ảnh đã tồn tại !" });
+          res.status(422).json({ message: error });
         });
     } catch (error) {
       res.status(401).json({ message: error });
@@ -104,7 +112,7 @@ function PUT_IMAGE(req, res) {
 }
 
 async function DELETE_IMAGE(req, res) {
-  await Image.findByIdAndDelete(req.params.id)
+  await Image.deleteOne({ _id: req.params.code })
     .then((deleted) => {
       res.status(200).json("Delete Success");
     })
