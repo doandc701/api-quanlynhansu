@@ -32,6 +32,7 @@ const User = new Schema(
       sparse: true,
     },
     phone_number: { type: String },
+    hard_salary: Number,
     branch_code: Object,
     department_code: Object,
     position_id: Number,
