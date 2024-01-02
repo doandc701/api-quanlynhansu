@@ -75,15 +75,14 @@ async function POST_TIMEKEEPING(req, res) {
 
     if (existingRecord) {
       // check thứ 7 chủ nhật
-      const dateTimeKeeping = moment(
-        req.body.employees.employee.date_timekeeping
-      );
+      const dateTimeKeeping = moment(req.body.employees.date_timekeeping);
       if (dateTimeKeeping.day() === 0 || dateTimeKeeping.day() === 6) {
         res.status(400).json({ message: "Ngày chấm công không hợp lệ!" });
         return;
       }
       const findDoneTimeKeeping = existingRecord.employees.find(
-        (item) => item.employee.code === req.body.employees.employee.code
+        (item) =>
+          item.employee.date_timekeeping === req.body.employees.date_timekeeping
       );
       if (findDoneTimeKeeping) {
         res.status(400).json({ message: "Đã chấm công trong ngày hôm nay" });

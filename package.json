@@ -31,9 +31,7 @@
     "multer": "^1.4.5-lts.1",
     "node-schedule": "^2.1.1",
     "rate-limit-redis": "^3.0.1",
-    "redis": "^4.6.5",
-    "upgrade": "^1.1.0",
-    "uuidv4": "^6.2.13"
+    "redis": "^4.6.5"
   },
   "devDependencies": {
     "nodemon": "^2.0.22",
