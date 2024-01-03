@@ -81,8 +81,7 @@ async function POST_TIMEKEEPING(req, res) {
         return;
       }
       const findDoneTimeKeeping = existingRecord.employees.find(
-        (item) =>
-          item.employee.date_timekeeping === req.body.employees.date_timekeeping
+        (item) => item.date_timekeeping === req.body.employees.date_timekeeping
       );
       if (findDoneTimeKeeping) {
         res.status(400).json({ message: "Đã chấm công trong ngày hôm nay" });
