@@ -2,48 +2,39 @@ import Timekeeping from "../models/timekeeping.model.js";
 import moment from "moment";
 
 async function LIST_TIMEKEEPING(req, res) {
-  const newQuery = req.query;
-  const searchCondition = {};
+  const { page, limit, sorts, search, filters } = req.query;
   const countRecord = await Timekeeping.countDocuments().catch(() => {});
-  if (newQuery) {
-    const skip =
-      Number(newQuery.page) * Number(newQuery.limit) - Number(newQuery.limit);
-    let query = Timekeeping.find();
-    if (newQuery.sorts) {
-      if (Object.keys(newQuery.sorts).length > 0) {
-        query = query.sort(newQuery.sorts);
+
+  const result = await Timekeeping.find()
+    .sort(sorts)
+    .skip((page - 1) * limit)
+    .limit(limit);
+
+  result.forEach((item) => {
+    if (item.year === filters.year) {
+      if (filters.code) {
+        const filterJs = item.employees.filter(
+          (el) => el.employee.code === filters.code
+        );
+        item.employees = filterJs;
+      }
+      if (search) {
+        const searchJs = item.employees.filter(
+          (el) => el.date_timekeeping === search.date_timekeeping
+        );
+        item.employees = searchJs;
       }
     }
+  });
 
-    if (newQuery.search && Object.keys(newQuery.search).length > 0) {
-      const search = {
-        "employees.date_timekeeping": newQuery.search["date_timekeeping"],
-      };
-      query.find({ $text: { $search: search } });
-    }
-
-    if (newQuery.filters) {
-      if (newQuery.filters.code) {
-        query = Timekeeping.find({
-          "employees.employee.code": newQuery.filters.code,
-          year: newQuery.filters.year,
-        });
-      }
-    }
-
-    const results = await query
-      .skip(skip)
-      .limit(newQuery.limit)
-      .catch(() => {});
-
-    return res.status(200).json({
-      data: results,
-      current_page: Number(newQuery.page),
-      limit: Number(newQuery.limit),
-      total: countRecord,
-    });
-  }
+  return res.status(200).json({
+    data: result,
+    current_page: Number(page),
+    limit: Number(limit),
+    total: countRecord,
+  });
 }
+
 async function GET_TIMEKEEPING(req, res) {
   const recordTimekeeping = await Timekeeping.findOne({
     code: req.params.code,
@@ -55,16 +46,40 @@ async function GET_TIMEKEEPING(req, res) {
 
 async function POST_TIMEKEEPING(req, res) {
   try {
+    // check ngày hiện tại với ngày chấm
+    const getCurrentDate = moment().format("YYYY-MM-DD");
+    if (req.body.employees.date_timekeeping !== getCurrentDate) {
+      res.status(400).json({ message: "Ngày chấm công không hợp lệ!" });
+      return;
+    }
+
+    // check thứ 7 chủ nhật
+    const dateTimeKeeping = moment(req.body.employees.date_timekeeping);
+    if (dateTimeKeeping.day() === 0 || dateTimeKeeping.day() === 6) {
+      res.status(400).json({ message: "Ngày chấm công không hợp lệ!" });
+      return;
+    }
+
+    // check chấm công trong khung giờ
+    const getCurrentHour = moment().hour();
+    const getCurrentMinutes = moment().minutes();
+    if (getCurrentHour < 8 || getCurrentHour > 17) {
+      res.status(400).json({ message: "Giờ chấm công không hợp lệ!" });
+      return;
+    }
+
+    if (getCurrentHour === 17 && getCurrentMinutes > 15) {
+      res.status(400).json({ message: "Giờ chấm công không hợp lệ!" });
+      return;
+    }
+
     const existingRecord = await Timekeeping.findOne({ year: req.body.year });
     let workday = 0;
     const startTime = moment(req.body.employees.start_time, "HH:mm");
     const endTime = moment(req.body.employees.end_time, "HH:mm");
-    // Thời gian nghỉ trưa là 1 giờ và 15 phút
     const lunchBreakDuration = moment.duration({ hours: 1, minutes: 15 });
-    // Áp dụng thời gian nghỉ trưa để tính thời gian thực làm việc
     const workingTime =
       endTime.diff(startTime) - lunchBreakDuration.asMilliseconds();
-    // Tính số giờ làm việc
     const workingHours = moment.duration(workingTime).asHours();
 
     if (workingHours >= 4 && workingHours < 8) {
@@ -74,23 +89,20 @@ async function POST_TIMEKEEPING(req, res) {
     }
 
     if (existingRecord) {
-      // check thứ 7 chủ nhật
-      const dateTimeKeeping = moment(req.body.employees.date_timekeeping);
-      if (dateTimeKeeping.day() === 0 || dateTimeKeeping.day() === 6) {
-        res.status(400).json({ message: "Ngày chấm công không hợp lệ!" });
-        return;
-      }
-      const findDoneTimeKeeping = existingRecord.employees.find(
+      const findDoneTimeKeeping = existingRecord.employees.filter(
         (item) => item.date_timekeeping === req.body.employees.date_timekeeping
       );
-      if (findDoneTimeKeeping) {
+      const hasNv = findDoneTimeKeeping.some(
+        (item) => item.employee.code === req.body.employees.employee.code
+      );
+      if (hasNv) {
         res.status(400).json({ message: "Đã chấm công trong ngày hôm nay" });
-      } else {
-        let obj = { ...req.body.employees, workday };
-        existingRecord.employees.push(obj);
-        await existingRecord.save();
-        res.status(200).json(existingRecord);
+        return;
       }
+      let obj = { ...req.body.employees, workday };
+      existingRecord.employees.push(obj);
+      await existingRecord.save();
+      res.status(200).json(existingRecord);
     } else {
       const newRecord = new Timekeeping();
       let obj = { ...req.body.employees, workday };
