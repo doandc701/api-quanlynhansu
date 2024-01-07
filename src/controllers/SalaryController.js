@@ -62,6 +62,13 @@ async function GET_SALARY(req, res) {
 
 async function POST_SALARY(req, res) {
   try {
+    if (
+      !req.body.employees[0].actual_workday ||
+      !req.body.employees[0].salary_received
+    ) {
+      res.status(400).json({ message: "Dữ kiện chưa đầy đủ để tính lương !" });
+      return;
+    }
     const existingRecord = await Salary.findOne({ year: req.body.year });
     if (existingRecord) {
       const findDoneTimeKeeping = existingRecord.employees.find(
