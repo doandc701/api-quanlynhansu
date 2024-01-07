@@ -50,9 +50,25 @@ import {
   postRoles,
 } from "../../controllers/Authentication/RolesController.js";
 
+import {
+  LIST_SALARY,
+  GET_SALARY,
+  POST_SALARY,
+  PUT_SALARY,
+  DELETE_SALARY,
+} from "../../controllers/SalaryController.js";
+
 // import { loginAccountLimiter } from "../../services/rateLimit.service";
 
 const router = express.Router();
+
+// salary
+
+router.delete("/salary/:code", DELETE_SALARY);
+router.put("/salary/:code", PUT_SALARY);
+router.post("/salary", POST_SALARY);
+router.get("/salary/:code", GET_SALARY);
+router.get("/salary", LIST_SALARY);
 
 // user
 router.delete("/user/:code", DELETE_USER);

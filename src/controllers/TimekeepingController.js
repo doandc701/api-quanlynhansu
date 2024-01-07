@@ -3,27 +3,43 @@ import moment from "moment";
 
 async function LIST_TIMEKEEPING(req, res) {
   const { page, limit, sorts, search, filters } = req.query;
+
+  const query = {};
+  if (filters.year) {
+    query.year = filters.year;
+  }
+  if (filters.month) {
+    query["employees.date_timekeeping"] = {
+      $gte: `${filters.year}-${filters.month.padStart(2, "0")}-01`,
+      $lt: `${filters.year}-${(parseInt(filters.month) + 1)
+        .toString()
+        .padStart(2, "0")}-01`,
+    };
+  }
+
+  // if (filters.code) {
+  //   query["employees.employee.code"] = filters.code;
+  // }
+
   const countRecord = await Timekeeping.countDocuments().catch(() => {});
 
-  const result = await Timekeeping.find()
+  const result = await Timekeeping.find(query)
     .sort(sorts)
     .skip((page - 1) * limit)
     .limit(limit);
 
   result.forEach((item) => {
-    if (item.year === filters.year) {
-      if (filters.code) {
-        const filterJs = item.employees.filter(
-          (el) => el.employee.code === filters.code
-        );
-        item.employees = filterJs;
-      }
-      if (search) {
-        const searchJs = item.employees.filter(
-          (el) => el.date_timekeeping === search.date_timekeeping
-        );
-        item.employees = searchJs;
-      }
+    if (filters.code) {
+      const filterJs = item.employees.filter(
+        (el) => el.employee.code === filters.code
+      );
+      item.employees = filterJs;
+    }
+    if (search) {
+      const searchJs = item.employees.filter(
+        (el) => el.date_timekeeping === search.date_timekeeping
+      );
+      item.employees = searchJs;
     }
   });
 
