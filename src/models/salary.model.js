@@ -16,6 +16,7 @@ const salary = new Schema(
           personal_income_tax: Number,
           total: Number,
         },
+        month: Number,
         salary_received: Number,
       },
     ],

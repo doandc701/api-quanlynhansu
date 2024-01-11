@@ -65,7 +65,7 @@ const router = express.Router();
 // salary
 
 router.delete("/salary/:code", DELETE_SALARY);
-router.put("/salary/:code", PUT_SALARY);
+router.put("/salary/:code/:year", PUT_SALARY);
 router.post("/salary", POST_SALARY);
 router.get("/salary/:code", GET_SALARY);
 router.get("/salary", LIST_SALARY);
