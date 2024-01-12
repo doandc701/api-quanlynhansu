@@ -16,6 +16,32 @@ const verifyToken = (req, res, next) => {
   }
 };
 
+const jwtAuthMiddleware = (req, res, next) => {
+  // Lấy token từ header
+  const token = req.header("Authorization");
+  // console.log(token);
+  // Kiểm tra xem token có tồn tại không
+  if (!token) {
+    return res.status(401).json({
+      code: 401,
+      messages: ["token.required"],
+    });
+  }
+
+  try {
+    // Xác thực token
+    const tokenSplit = req.headers.authorization.split(" ")[1];
+    const decoded = jwt.verify(tokenSplit, process.env.TOKEN_SECRET);
+    req.user = decoded.user; // Lưu thông tin người dùng vào request để sử dụng trong các router khác
+    next();
+  } catch (error) {
+    return res.status(401).json({
+      code: 401,
+      messages: "token.required",
+    });
+  }
+};
+
 const isAdmin = (req, res, next) => {
   USER.findById(req.userId)
     .then((userID) => {
@@ -63,4 +89,4 @@ const isModerator = (req, res, next) => {
   });
 };
 
-export { verifyToken, isAdmin, isModerator };
+export { verifyToken, isAdmin, isModerator, jwtAuthMiddleware };

@@ -29,8 +29,12 @@ async function uploadImage(file, quantity) {
       storageRef,
       file.buffer,
       metadata
-    );
-    const downloadURL = await getDownloadURL(snapshot.ref);
+    ).catch((error) => {
+      res.status(401).json({ message: error });
+    });
+    const downloadURL = await getDownloadURL(snapshot.ref).catch((error) => {
+      res.status(401).json({ message: error });
+    });
     return downloadURL;
   }
   if (quantity === "multiple") {
@@ -44,7 +48,13 @@ async function uploadImage(file, quantity) {
       const saveImage = await Image.create({ imageUrl: fileName });
       file.item.imageId.push({ _id: saveImage._id });
       await file.item.save();
-      await uploadBytesResumable(storageRef, file.images[i].buffer, metadata);
+      await uploadBytesResumable(
+        storageRef,
+        file.images[i].buffer,
+        metadata
+      ).catch((error) => {
+        res.status(401).json({ message: error });
+      });
     }
     return;
   }
@@ -87,13 +97,15 @@ async function POST_IMAGE(req, res) {
       origin_name: req.file.originalname,
     };
     try {
-      const buildImage = await uploadImage(file, "single");
+      const buildImage = await uploadImage(file, "single").catch((error) => {
+        res.status(401).json({ message: error });
+      });
       image.path = buildImage;
       image.origin_name = req.file.originalname;
       image
         .save()
         .then((add) => {
-          res.status(200).json(add);
+          res.status(200).json(add);  
         })
         .catch((error) => {
           res.status(401).json({ message: error });

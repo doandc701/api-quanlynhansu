@@ -14,23 +14,22 @@ import {
   setLoginAttempts,
 } from "../../middlewares/loginAccountLimiter.js";
 import analytics from "../../config/firebase.config.js";
-import nodemailer from 'nodemailer'
+import nodemailer from "nodemailer";
 import "dotenv/config";
 
 const ROLES = ObjectDatabase.role;
 const USER = ObjectDatabase.user;
 
-
 // Tạo một transporter với thông tin đăng nhập của bạn
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  service: "gmail",
   host: "smtp.forwardemail.net",
   port: 465,
   secure: true,
   auth: {
     user: process.env.AUTH_MAILER, // Địa chỉ email của bạn
-    pass: process.env.PASS_MAILER   // Mật khẩu của bạn
-  }
+    pass: process.env.PASS_MAILER, // Mật khẩu của bạn
+  },
 });
 
 const authFirebase = await signInWithEmailAndPassword(
@@ -87,7 +86,7 @@ async function GET_USER(req, res, next) {
 
 async function POST_USER(req, res) {
   let dataObject = Object.assign(req.body);
-  let passDefault = `${req.body.code}NSda$`
+  let passDefault = `${req.body.code}NSda$`;
   dataObject.password = bcrypt.hashSync(passDefault, 8);
   const recordBranch = await Branchs.findOne({
     code: { $in: req.body.branch_code },
@@ -104,16 +103,16 @@ async function POST_USER(req, res) {
     .then((add) => {
       // Đối tượng chứa thông tin email
       const mailOptions = {
-        from: `QuanLyNhanSu <${process.env.AUTH_MAILER}>`,       // Địa chỉ email người gửi
-        to: add.email,     // Địa chỉ email người nhận
-        subject: 'Chào mừng bạn đến với hệ thống',
-        html: `Dưới đây là tài khoản và mật khẩu để đăng nhập vào hệ thống
+        from: `QuanLyNhanSu <${process.env.AUTH_MAILER}>`, // Địa chỉ email người gửi
+        to: add.email, // Địa chỉ email người nhận
+        subject: "Chào mừng bạn đến với hệ thống",
+        html: `<p>Dưới đây là tài khoản và mật khẩu để đăng nhập vào hệ thống</p>
             <ul>
                 <li>Tài khoản: ${add.email}</li>
                 <li>Mật khẩu: ${passDefault}</li>
             </ul>
             <p>Click vào link này để đăng nhập vào hệ thống: <a href='datt-hrm.vercel.app'>datt-hrm.vercel.app</a></p>
-          `
+          `,
       };
       // Gửi email
       transporter.sendMail(mailOptions, (error, info) => {
