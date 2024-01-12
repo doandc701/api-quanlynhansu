@@ -14,10 +14,24 @@ import {
   setLoginAttempts,
 } from "../../middlewares/loginAccountLimiter.js";
 import analytics from "../../config/firebase.config.js";
+import nodemailer from 'nodemailer'
 import "dotenv/config";
 
 const ROLES = ObjectDatabase.role;
 const USER = ObjectDatabase.user;
+
+
+// Tạo một transporter với thông tin đăng nhập của bạn
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  host: "smtp.forwardemail.net",
+  port: 465,
+  secure: true,
+  auth: {
+    user: process.env.AUTH_MAILER, // Địa chỉ email của bạn
+    pass: process.env.PASS_MAILER   // Mật khẩu của bạn
+  }
+});
 
 const authFirebase = await signInWithEmailAndPassword(
   analytics,
@@ -73,7 +87,8 @@ async function GET_USER(req, res, next) {
 
 async function POST_USER(req, res) {
   let dataObject = Object.assign(req.body);
-  dataObject.password = bcrypt.hashSync("Pass1234@", 8);
+  let passDefault = `${req.body.code}NSda$`
+  dataObject.password = bcrypt.hashSync(passDefault, 8);
   const recordBranch = await Branchs.findOne({
     code: { $in: req.body.branch_code },
   });
@@ -87,6 +102,25 @@ async function POST_USER(req, res) {
   await user
     .save()
     .then((add) => {
+      // Đối tượng chứa thông tin email
+      const mailOptions = {
+        from: `QuanLyNhanSu <${process.env.AUTH_MAILER}>`,       // Địa chỉ email người gửi
+        to: add.email,     // Địa chỉ email người nhận
+        subject: 'Chào mừng bạn đến với hệ thống',
+        html: `Dưới đây là tài khoản và mật khẩu để đăng nhập vào hệ thống
+            <ul>
+                <li>Tài khoản: ${add.email}</li>
+                <li>Mật khẩu: ${passDefault}</li>
+            </ul>
+            <p>Click vào link này để đăng nhập vào hệ thống: <a href='datt-hrm.vercel.app'>datt-hrm.vercel.app</a></p>
+          `
+      };
+      // Gửi email
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          res.status(401).json({ message: error });
+        }
+      });
       res.status(200).json(add);
     })
     .catch((error) => {
