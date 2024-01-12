@@ -77,10 +77,10 @@ async function POST_TIMEKEEPING(req, res) {
     }
 
     // check chấm công trong khung giờ
-    const getCurrentHour = new Date().getHours();
-    const getCurrentMinutes = new Date().getMinutes();
-    res.status(400).json({ message: getCurrentHour,message2:getCurrentMinutes, condition1:getCurrentHour < 8 , condition2: getCurrentHour > 17});
-    return
+    const dateInUTC = moment.utc();
+    const dateInGMTPlus7 = dateInUTC.clone().utcOffset('+07:00');
+    const getCurrentHour = dateInGMTPlus7.hour();
+    const getCurrentMinutes = moment().minutes();
     if (getCurrentHour < 8 || getCurrentHour > 17) {
       res.status(400).json({ message: "Giờ chấm công không hợp lệ!" });
       return;
