@@ -77,8 +77,8 @@ async function POST_TIMEKEEPING(req, res) {
     }
 
     // check chấm công trong khung giờ
-    const getCurrentHour = moment().hour();
-    const getCurrentMinutes = moment().minutes();
+    const getCurrentHour = new Date().getHours();
+    const getCurrentMinutes = new Date().getMinutes();
     res.status(400).json({ message: getCurrentHour,message2:getCurrentMinutes, condition1:getCurrentHour < 8 , condition2: getCurrentHour > 17});
     return
     if (getCurrentHour < 8 || getCurrentHour > 17) {
