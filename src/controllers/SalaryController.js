@@ -57,6 +57,12 @@ async function POST_SALARY(req, res) {
     }
     const existingRecord = await Salary.findOne({ year: req.body.year });
     if (existingRecord) {
+      if (!existingRecord.employees.length) {
+        existingRecord.employees.push(req.body.employees["0"]);
+        await existingRecord.save();
+        res.status(200).json(existingRecord);
+        return;
+      }
       const findDoneTimeKeeping = existingRecord.employees.find(
         (item) => item.month === req.body.employees[0].month
       );
@@ -77,6 +83,7 @@ async function POST_SALARY(req, res) {
       res.status(200).json(existingRecord);
     } else {
       const newRecord = new Salary(req.body);
+      console.log(newRecord);
       await newRecord.save();
       res.status(200).json(newRecord);
     }
