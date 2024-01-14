@@ -16,6 +16,23 @@ const verifyToken = (req, res, next) => {
   }
 };
 
+const verifyTokenUser = (token) => {
+  try {
+    // Giải mã token và kiểm tra chữ ký
+    const decoded = jwt.verify(token, process.env.TOKEN_SECRET);
+    // Lấy thông tin người dùng từ payload
+    const userInfo = decoded.id;
+    return userInfo;
+  } catch (error) {
+    // Xử lý lỗi khi token không hợp lệ
+    return res.status(401).json({
+      code: 401,
+      messages: "Token không hợp lệ",
+    });
+    return null;
+  }
+};
+
 const jwtAuthMiddleware = (req, res, next) => {
   // Lấy token từ header
   const token = req.header("Authorization");
@@ -24,7 +41,7 @@ const jwtAuthMiddleware = (req, res, next) => {
   if (!token) {
     return res.status(401).json({
       code: 401,
-      messages: ["token.required"],
+      messages: "token.required",
     });
   }
 
@@ -89,4 +106,10 @@ const isModerator = (req, res, next) => {
   });
 };
 
-export { verifyToken, isAdmin, isModerator, jwtAuthMiddleware };
+export {
+  verifyToken,
+  isAdmin,
+  isModerator,
+  jwtAuthMiddleware,
+  verifyTokenUser,
+};
