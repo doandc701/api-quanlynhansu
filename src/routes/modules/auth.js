@@ -16,6 +16,7 @@ import {
 import {
   SignUp,
   SignIn,
+  ChangePass,
 } from "../../controllers/Authentication/AuthController.js";
 
 import {
@@ -27,6 +28,7 @@ import {
 
 const router = express.Router();
 
+router.post("/change-password", ChangePass);
 router.post("/register", SignUp);
 router.post("/login", SignIn);
 

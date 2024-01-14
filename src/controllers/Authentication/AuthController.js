@@ -13,6 +13,8 @@ import {
   checkLoginAttempts,
   setLoginAttempts,
 } from "../../middlewares/loginAccountLimiter.js";
+import { verifyTokenUser } from "../../middlewares/authJwt.js";
+
 import analytics from "../../config/firebase.config.js";
 import nodemailer from "nodemailer";
 import "dotenv/config";
@@ -323,6 +325,34 @@ const SignIn = async (req, res, next) => {
   }
 };
 
+async function ChangePass(req, res) {
+  const token = req.headers.authorization?.split(" ")[1];
+  const userId = verifyTokenUser(token);
+  if (!userId) {
+    res.status(422).json({ message: "Token không hợp lệ" });
+    return;
+  }
+  const getUser = await USER.findOne({ _id: userId });
+  if (!getUser) {
+    res.status(422).json({ message: "Người dùng không tồn tại." });
+    return;
+  }
+
+  const isPasswordValid = await bcrypt.compare(
+    req.body.old_password,
+    getUser.password
+  );
+
+  if (!isPasswordValid) {
+    res.status(422).json({ message: "Mật khẩu hiện tại không đúng." });
+    return;
+  }
+  const hashedNewPassword = await bcrypt.hash(req.body.new_password, 8);
+  getUser.password = hashedNewPassword;
+  await getUser.save();
+  res.status(200).json({ message: "Đổi mật khẩu thành công." });
+}
+
 export {
   LIST_USER,
   GET_USER,
@@ -331,4 +361,5 @@ export {
   DELETE_USER,
   SignIn,
   SignUp,
+  ChangePass,
 };
