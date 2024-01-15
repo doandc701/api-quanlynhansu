@@ -1,5 +1,6 @@
-import Salary from "../models/salary.model.js";
 import moment from "moment";
+import ExcelJS from "exceljs";
+import Salary from "../models/salary.model.js";
 
 async function LIST_SALARY(req, res) {
   const { page, limit, sorts, filters } = req.query;
@@ -83,7 +84,6 @@ async function POST_SALARY(req, res) {
       res.status(200).json(existingRecord);
     } else {
       const newRecord = new Salary(req.body);
-      console.log(newRecord);
       await newRecord.save();
       res.status(200).json(newRecord);
     }
@@ -119,4 +119,100 @@ async function DELETE_SALARY(req, res) {
   res.status(200).json(recordSalary);
 }
 
-export { LIST_SALARY, GET_SALARY, POST_SALARY, PUT_SALARY, DELETE_SALARY };
+async function EXPORT_TO_EXCEL(req, res) {
+  const workbook = new ExcelJS.Workbook();
+  const recordSalary = await Salary.findOne({
+    year: moment().year(),
+  }).catch(() => { });
+
+  if (!recordSalary) {
+    res.status(422).json({ message: "Không có dữ liệu để xuất" })
+    return
+  }
+  const recordDetail = recordSalary.employees.find(
+    (item) => item.employee.code === req.params.code
+  );
+
+  if (!recordDetail) {
+    res.status(422).json({ message: "Không có dữ liệu để xuất" })
+    return
+  }
+
+  const targetObject = {
+    social_insurance: recordDetail.deducted_from_salary.social_insurance,
+    health_insurance: recordDetail.deducted_from_salary.health_insurance,
+    voluntary_insurance: recordDetail.deducted_from_salary.voluntary_insurance,
+    personal_income_tax: recordDetail.deducted_from_salary.personal_income_tax ?? '',
+    total: recordDetail.deducted_from_salary.total,
+    code: recordDetail.employee.code,
+    name: `${recordDetail.employee.first_name} ${recordDetail.employee.last_name}`,
+    standard_working_day: recordDetail.standard_working_day,
+    actual_workday: recordDetail.actual_workday,
+    official_paid_working: recordDetail.official_paid_working,
+    month: recordDetail.month,
+    salary_received: recordDetail.salary_received,
+  }
+
+  const worksheet = workbook.addWorksheet('Sheet 1');
+  worksheet.columns = [
+    {
+      header: "Lương tháng", key: 'month', width: 15
+    },
+    {
+      header: "Mã nhân viên", key: 'code', width: 15
+    },
+    {
+      header: "Tên nhân viên", key: 'name', width: 30
+    },
+    {
+      header: "Ngày công được tính", key: 'actual_workday', width: 25
+    },
+    {
+      header: "Ngày công chuẩn", key: 'standard_working_day', width: 25
+    },
+    {
+      header: "Lương chính thức", key: 'official_paid_working', width: 25
+    },
+    {
+      header: "Bảo hiểm xã hội", key: 'social_insurance', width: 25
+    },
+    {
+      header: "Bảo hiểm y tế", key: 'health_insurance', width: 25
+    },
+    {
+      header: "Bảo hiểm thất nghiệp", key: 'voluntary_insurance', width: 25
+    },
+    {
+      header: "Thuế thu nhập cá nhân", key: 'personal_income_tax', width: 25
+    },
+    {
+      header: "Tổng các khoản khẩu trừ", key: 'total', width: 25
+    },
+    {
+      header: "Thực lãnh", key: 'salary_received', width: 25
+    },
+  ]
+
+  worksheet.addRow({
+    month: targetObject.month,
+    code: targetObject.code,
+    name: targetObject.name,
+    actual_workday: targetObject.actual_workday,
+    standard_working_day: targetObject.standard_working_day,
+    official_paid_working: targetObject.official_paid_working,
+    social_insurance: targetObject.social_insurance,
+    health_insurance: targetObject.health_insurance,
+    voluntary_insurance: targetObject.voluntary_insurance,
+    personal_income_tax: targetObject.personal_income_tax,
+    total: targetObject.total,
+    salary_received: targetObject.salary_received,
+  })
+
+  // Set up the response headers 
+  res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); 
+  res.setHeader("Content-Disposition", "attachment; filename=" + "Salary.xlsx");
+  await workbook.xlsx.write(res).catch(()=> {});
+  res.end();
+}
+
+export { LIST_SALARY, GET_SALARY, POST_SALARY, PUT_SALARY, DELETE_SALARY, EXPORT_TO_EXCEL };

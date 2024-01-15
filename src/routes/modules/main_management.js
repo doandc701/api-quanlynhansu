@@ -56,6 +56,7 @@ import {
   POST_SALARY,
   PUT_SALARY,
   DELETE_SALARY,
+  EXPORT_TO_EXCEL
 } from "../../controllers/SalaryController.js";
 
 // import { loginAccountLimiter } from "../../services/rateLimit.service";
@@ -67,6 +68,7 @@ const router = express.Router();
 router.delete("/salary/:code", DELETE_SALARY);
 router.put("/salary/:code/:year", PUT_SALARY);
 router.post("/salary", POST_SALARY);
+router.get("/export-salary/:code", EXPORT_TO_EXCEL);
 router.get("/salary/:code", GET_SALARY);
 router.get("/salary", LIST_SALARY);
 
