@@ -159,9 +159,6 @@ async function EXPORT_TO_EXCEL(req, res) {
       header: "Lương tháng", key: 'month', width: 15
     },
     {
-      header: "Mã nhân viên", key: 'code', width: 15
-    },
-    {
       header: "Tên nhân viên", key: 'name', width: 30
     },
     {
@@ -174,13 +171,13 @@ async function EXPORT_TO_EXCEL(req, res) {
       header: "Lương chính thức", key: 'official_paid_working', width: 25
     },
     {
-      header: "Bảo hiểm xã hội", key: 'social_insurance', width: 25
+      header: "Bảo hiểm xã hội (8%)", key: 'social_insurance', width: 25
     },
     {
-      header: "Bảo hiểm y tế", key: 'health_insurance', width: 25
+      header: "Bảo hiểm y tế (1.5%)", key: 'health_insurance', width: 25
     },
     {
-      header: "Bảo hiểm thất nghiệp", key: 'voluntary_insurance', width: 25
+      header: "Bảo hiểm thất nghiệp (1%)", key: 'voluntary_insurance', width: 25
     },
     {
       header: "Thuế thu nhập cá nhân", key: 'personal_income_tax', width: 25

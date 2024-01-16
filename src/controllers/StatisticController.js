@@ -2,6 +2,7 @@ import Branchs from "../models/branch.model.js";
 import Department from "../models/department.model.js";
 import Salary from "../models/salary.model.js";
 import Timekeeping from "../models/timekeeping.model.js";
+import moment from "moment";
 import { ObjectDatabase } from "../models/auth/index.js";
 
 const USER = ObjectDatabase.user;
@@ -12,8 +13,8 @@ async function LIST_STATISTIC(req, res, next) {
   const countRecordDepartment = await Department.countDocuments().catch(
     () => {}
   );
-  const countRecordSalary = await Salary.countDocuments().catch(() => {});
-  const countRecordTimekeeping = await Timekeeping.countDocuments().catch(
+  const countRecordSalary = await Salary.findOne({year: moment().year()}).catch(() => {});
+  const countRecordTimekeeping = await Timekeeping.findOne({year: moment().year()}).catch(
     () => {}
   );
   const countRecordUSER = await USER.countDocuments().catch(() => {});
@@ -27,11 +28,11 @@ async function LIST_STATISTIC(req, res, next) {
   });
   newStatistic.push({
     key: "Lương",
-    value: countRecordSalary,
+    value: countRecordSalary?.employees?.length ? countRecordSalary?.employees?.length : 0,
   });
   newStatistic.push({
     key: "Chấm công",
-    value: countRecordTimekeeping,
+    value: countRecordTimekeeping?.employees?.length ? countRecordTimekeeping?.employees?.length : 0,
   });
   newStatistic.push({
     key: "Nhân viên",
