@@ -113,7 +113,7 @@ async function POST_USER(req, res) {
                 <li>Tài khoản: ${add.email}</li>
                 <li>Mật khẩu: ${passDefault}</li>
             </ul>
-            <p>Click vào link này để đăng nhập vào hệ thống: <a href='datt-hrm.vercel.app'>datt-hrm.vercel.app</a></p>
+            <p>Click vào link này để đăng nhập vào hệ thống: <a href='https://nado-hrm.vercel.app/'>nado-hrm.vercel.app</a></p>
           `,
       };
       // Gửi email
