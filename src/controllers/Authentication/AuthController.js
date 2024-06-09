@@ -338,17 +338,18 @@ const SignIn = async (req, res, next) => {
         req.body.password,
         user.password
       );
-      // if (!passwordIsValid) {
-      //   checkRedis = await setLoginAttempts(ip.address());
-      //   const remaining = 3 - parseInt(checkRedis.data.count);
-      //   res.status(404).json({
-      //     message: `${remaining
-      //       ? `Bạn còn ${remaining} lần nhập`
-      //       : "Tài khoản hoặc mật khẩu không đúng !"
-      //       }`,
-      //   });
-      //   return;
-      // }
+      if (!passwordIsValid) {
+        // checkRedis = await setLoginAttempts(ip.address());
+        // const remaining = 3 - parseInt(checkRedis.data.count);
+        const remaining = "";
+        res.status(404).json({
+          message: `${remaining
+            ? `Bạn còn ${remaining} lần nhập`
+            : "Tài khoản hoặc mật khẩu không đúng !"
+            }`,
+        });
+        return;
+      }
 
       const token = jwt.sign({ id: user.id }, process.env.TOKEN_SECRET, {
         expiresIn: 86400, // 24 hours
